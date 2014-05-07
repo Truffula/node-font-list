@@ -1,0 +1,27 @@
+{
+    "name": "system-font-list",
+    "version": "0.5",
+    "description": "Get a list of all the fonts installed on your system",
+    "keywords": [
+        "font",
+        "system font",
+        "node-webkit"
+    ],
+    "homepage": "https://github.com/Talon1024/node-font-list",
+    "bugs": {
+        "url": "https://github.com/Talon1024/node-font-list/issues",
+        "email": "kevin@ciinet.org"
+    },
+    "license": "GPL-3.0+",
+    "author": {
+        "name": "Kevin Caccamo",
+        "email": "kevin@ciinet.org",
+        "url": "http://www.ciinet.org/kevin"
+    },
+    "main": "fontlist.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Talon1024/node-font-list.git"
+    },
+    "os": [ "!darwin" ]
+}
