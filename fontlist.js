@@ -32,7 +32,7 @@ if (strPlatform === "win32"
         searchSubdirs: false, // Font paths have subdirectories
         dirs: "C:\\WINDOWS\\FONTS" // dir for single system font directory
     };
-} else if (strPlatform === "Linux_x86") {
+} else if (strPlatform === "linux") {
     isFont = function(extn) {
         switch(extn) {
             case ".ttf":  // Intentional fall-through, as
@@ -45,20 +45,21 @@ if (strPlatform === "win32"
                 return false;
         }
     };
-    var getLinuxFontDirs = function() {
-        var aFontPaths = [];
-        var reFontDirRegex = /<dir(\s\w+=['"][\w\s]+['"])*>(.+)<\/dir>/igm;
-        var strFontConfPath = "/etc/fonts/fonts.conf";
-        // Linux's system font directories are listed in /etc/fonts/fonts.conf
-        var strFontConf = nmFs.readFileSync(
-            strFontConfPath,
-            { flags: "rs", encoding: "utf8" }
-        );
-
-    };
     objFontPaths = {
         searchSubdirs: true, // Font paths have subdirectories
-        dirs: getLinuxFontDirs() // dir for single system font directory
+        dirs: (function() {
+            var reFontDirRegex = /<dir(?:\s\w+=['"][^'"]+['"])*>([^<]+)<\/dir>/ig;
+            //var reFontDirRegex = /<dir>([^<]+)<\/dir>/ig;
+            //var rePathRegex = /\/(\w+)|\//i;
+            var strFontConfPath = "/etc/fonts/fonts.conf";
+            // Linux's system font directories are listed in /etc/fonts/fonts.conf
+            var strFontConf = nmFs.readFileSync(
+                strFontConfPath,
+                { flags: "rs", encoding: "utf8" }
+            );
+            // Find all font directories in font config file.
+            return reFontDirRegex.exec(strFontConf);
+        })()
     };
 }
 
@@ -66,7 +67,7 @@ function getFonts(strPath, searchSubdirs) {
     if (searchSubdirs === undefined) searchSubdirs = false;
     var aNames = nmFs.readdirSync(strPath);
     var strSep = nmPath.sep;
-    for (var iii = 0; iii < aNames.length; iii++) { // ES5
+    for (var iii = 0; iii < aNames.length; iii++) {
         var strFName = aNames[iii];
         var objFStat = nmFs.statSync(strPath + strSep + strFName);
         var strFExtn = "";
@@ -75,8 +76,7 @@ function getFonts(strPath, searchSubdirs) {
         } catch (e) {
             console.warn("No extension found on " + strFName + "!");
         }
-        if (objFStat.isFile()
-        && isFont(strFExtn)) {
+        if (objFStat.isFile() && isFont(strFExtn)) {
             aSystemFonts.push(nmPath.basename(strFName, strFExtn));
         } else if (objFStat.isDirectory() && searchSubdirs) {
             getFonts(strPath + strSep + strFName, true);
@@ -89,9 +89,10 @@ if (typeof objFontPaths.dirs === "string") { // One directory for system fonts
     getFonts(objFontPaths.dirs, objFontPaths.searchSubdirs);
 } else if (typeof objFontPaths.dirs === "object") { // Many directories for system fonts.
     console.log("Many directories for system fonts.");
-    for (var iii = 0; iii < objFontPaths.dirs.length; iii++) {
-        getFonts(objFontPaths.dirs[iii], objFontPaths.searchSubdirs);
-    }
+    console.log(objFontPaths.dirs);
+//    for (var iii = 0; iii < objFontPaths.dirs.length; iii++) {
+//        getFonts(objFontPaths.dirs[iii], objFontPaths.searchSubdirs);
+//    }
 }
 // for (var iii = 0; iii < aFontPaths.length; iii++) {
 //     if (iii === 0) {
