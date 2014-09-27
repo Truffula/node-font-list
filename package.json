@@ -1,6 +1,6 @@
 {
     "name": "system-font-list",
-    "version": "0.5",
+    "version": "0.5.0",
     "description": "Get a list of all the fonts installed on your system",
     "keywords": [
         "font",
